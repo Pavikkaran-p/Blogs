@@ -6,7 +6,7 @@
   },
   "dependencies": {
     "@100xdevs/common": "^1.0.2",
-    "@pavikkaran/blogapp": "^1.0.1",
+    "@pavikkaran/blogapp": "^1.0.2",
     "@prisma/client": "^5.19.1",
     "@prisma/extension-accelerate": "^1.2.0",
     "hono": "^4.6.2",
