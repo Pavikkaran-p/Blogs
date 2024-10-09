@@ -3,6 +3,7 @@ import { Appbar } from "./Appbar"
 import { Avatar } from "./BlogCard"
 
 export const FullBlog = ({ blog }: {blog: Blog}) => {
+    console.log(blog)
     return <div>
         <Appbar />
         <div className="flex justify-center">
@@ -24,11 +25,11 @@ export const FullBlog = ({ blog }: {blog: Blog}) => {
                     </div>
                     <div className="flex w-full">
                         <div className="pr-4 flex flex-col justify-center">
-                            <Avatar size="big" name={blog.author.name || "Anonymous"} />
+                            <Avatar size="big" name={blog?.author?.name || "Anonymous"} />
                         </div>
                         <div>
                             <div className="text-xl font-bold">
-                                {blog.author.name || "Anonymous"}
+                                {blog?.author?.name || "Anonymous"}
                             </div>
                             <div className="pt-2 text-slate-500">
                                 Random catch phrase about the author's ability to grab the user's attention

@@ -2,6 +2,7 @@ import { createBlogInput, updateBlogInput } from "@pavikkaran/blogapp";
 import { PrismaClient } from "@prisma/client/edge";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import { Hono } from "hono";
+import { getCookie } from "hono/cookie";
 import { decode, verify } from "hono/jwt";
 
 export const blogRouter=new Hono<{
@@ -15,10 +16,19 @@ export const blogRouter=new Hono<{
 }>()
 
 blogRouter.use("/*", async (c, next) => {
-    const authHeader = c.req.header("authorization") || "";
-    
+    const authToken = getCookie(c, "token");
+    const cur = getCookie(c);
+    // if(cur)
+    // return c.json(cur)
+    console.log(authToken)
+    if (!authToken) {
+      return c.text('Token not found', 401);
+    }   
+    const jwtToken = authToken.startsWith('Bearer ') ? authToken.split(' ')[1] : authToken;
+    console.log(jwtToken)
+    if(!jwtToken) return c.text("Unauthorized 01");
     try {
-      const user = await verify(authHeader, c.env.JWT_SECRET);
+      const user = await verify(jwtToken, c.env.JWT_SECRET);
       if (user ) {
         c.set('userId', String(user.id));
         console.log("first")
@@ -36,7 +46,7 @@ blogRouter.use("/*", async (c, next) => {
     }
   });
 
-blogRouter.post('/',async (c) => {
+blogRouter.post('/newblog',async (c) => {
     const body=await c.req.json()
     const {success} =createBlogInput.safeParse(body)
 	if(!success){
@@ -115,7 +125,7 @@ blogRouter.get('/blogbyid/:id',async (c) => {
 	return c.text('get blog route')
 })
 
-blogRouter.get('/', async (c) => {
+blogRouter.get('/allblogs', async (c) => {
     console.log("Request received at /allblogs route");
     const databaseUrl = c.env?.DATABASE_URL;
     if (!databaseUrl) {
@@ -126,10 +136,10 @@ blogRouter.get('/', async (c) => {
     const prisma = new PrismaClient({
         datasourceUrl: databaseUrl,
     }).$extends(withAccelerate());
-
+    console.log("00002")
     try {
         const blogs = await prisma.blog.findMany();
-        console.log("Fetched blogs:", blogs);
+        // console.log("Fetched blogs:", blogs);
         return c.json({
             blogs: blogs,
         });
